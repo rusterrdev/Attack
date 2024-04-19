@@ -39,21 +39,50 @@ type Attack = {
 	
 }
 
+type State = {}
+
+type HumanoidParams = {
+	human : Humanoid,
+	FadeOutAnimation : number,
+	Priority : Enum.AnimationPriority,
+
+	Animations : {
+		
+		[string] : Animation
+	}
+}
+
+
+--
+
+type SkillParams = {
+
+	ActivateKey : Enum.KeyCode,
+	IsPressing : boolean,
+
+	Cooldown : number,
+}
+
+type Skill = {
+	Start : () -> void,
+	
+
+}
+
 ---
 
 mod.__index = mod
 
 
---=>{
-
+--[[=>{
 --Metodos:
---GetContext(name : string, constructor : {} | nil)
+GetContext(name : string, constructor : {} | nil)
 
 
---=>}
+--=>}]]
 
 
-function mod:getContext(name : string, constructor : Constructor)
+function mod:GetContext(name : string, constructor : Constructor)
 	
 	local Definitions = {
 		_CurrentContext = self,
@@ -97,8 +126,21 @@ local RecursiveAttributeValues = {
 	
 }
 
-function mod:Init()
+function mod:Init(HumanoidParams : HumanoidParams)
 	
+	local AnimsRecursive = {}
+
+	pcall(function (args)
+		for k,v in HumanoidParams.Animations do
+			AnimsRecursive[k] = HumanoidParams.human:FindFirstChildOfClass('Animator'):LoadAnimation(v)
+			
+		end
+		for _, anim : AnimationTrack in AnimsRecursive do
+			anim.AnimationPriority = HumanoidParams.Priority
+
+		end
+	end)
+
 	local MethodsManagerTemplate  = {}
 	
 	do
@@ -122,7 +164,10 @@ function mod:Init()
 		
 		_self.cases.CurrentCase = (_self.cases.CurrentCase % _self.cases.MaxCases) + 1
 		
-	
+		pcall(function (args)
+			AnimsRecursive[_self.cases.CurrentCase]:Play(HumanoidParams.FadeOutAnimation)
+
+		end)
 		
 		local threads = {}
 		
@@ -155,7 +200,32 @@ function mod:Init()
 	return AttackManager
 end
 
+function mod:InitActivate(SkillParams : SkillParams)
 
+	local Skill : Skill = {
+		Start = function() end,
+	}
+
+	local uis = game:GetService('UserInputService')
+
+	local MethodsManagerTemplate  = {}
+
+	function MethodsManagerTemplate:Activate()
+		task.defer(Skill.Start)
+	end
+	
+
+	local isntance = setmetatable({}, {__index = MethodsManagerTemplate})
+
+	uis.InputBegan:Connect(function(input, gameProcessedEvent)
+		if input.KeyCode == SkillParams.ActivateKey and not gameProcessedEvent then
+			
+
+
+		end
+	end)
+
+end	
 
 
 return mod
