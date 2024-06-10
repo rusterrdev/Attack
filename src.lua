@@ -1,14 +1,13 @@
+local UIS = game:GetService('UserInputService')
+
 local mod = {}
 
---Types
-
-type void = '0' 
 
 
 
 local INITVALUETICK = tick()
 
-type CombatCases = {
+export type CombatCases = {
 	[string] : number,
 	CurrentCase : number,
 	MaxCases : number,
@@ -18,14 +17,14 @@ type CombatCases = {
 	CanAttack : boolean,
 	
 
-	init : () -> void,
+	init : () -> (),
 
 
 	Threads : {[thread] : thread}
 
 }
 
-type Constructor = {
+export type Constructor = {
 	cases : CombatCases,
 	
 	new: () -> CombatCases
@@ -34,14 +33,14 @@ type Constructor = {
 
 --
 
-type Attack = { 
-	Attacked : () -> void,
+export type Attack = { 
+	Attacked : () -> (),
 	
 }
 
-type State = {}
+export type State = {}
 
-type HumanoidParams = {
+export type HumanoidParams = {
 	human : Humanoid,
 	FadeOutAnimation : number,
 	Priority : Enum.AnimationPriority,
@@ -55,7 +54,7 @@ type HumanoidParams = {
 
 --
 
-type SkillParams = {
+export type SkillParams = {
 
 	ActivateKey : Enum.KeyCode,
 	IsPressing : boolean,
@@ -63,8 +62,8 @@ type SkillParams = {
 	Cooldown : number,
 }
 
-type Skill = {
-	Start : () -> void,
+export type Skill = {
+	Start : () -> (),
 	
 
 }
@@ -74,12 +73,6 @@ type Skill = {
 mod.__index = mod
 
 
---[[=>{
---Metodos:
-GetContext(name : string, constructor : {} | nil)
-
-
---=>}]]
 
 
 function mod:GetContext(name : string, constructor : Constructor)
@@ -202,12 +195,12 @@ end
 
 function mod:InitActivate(SkillParams : SkillParams)
 
-	local Skill : Skill = {
-		Start = function() end,
-	}
+	local Skill : Skill = {}
 
-	local uis = game:GetService('UserInputService')
-
+	function Skill.Start()
+	
+	end
+	
 	local MethodsManagerTemplate  = {}
 
 	function MethodsManagerTemplate:Activate()
@@ -215,12 +208,14 @@ function mod:InitActivate(SkillParams : SkillParams)
 	end
 	
 
-	local isntance = setmetatable({}, {__index = MethodsManagerTemplate})
+	local instance = setmetatable({}, {__index = MethodsManagerTemplate})
 
 	uis.InputBegan:Connect(function(input, gameProcessedEvent)
 		if input.KeyCode == SkillParams.ActivateKey and not gameProcessedEvent then
 			
-
+			return function()
+			--pass
+			end
 
 		end
 	end)
